@@ -37,6 +37,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.PublishSubject;
 
 public class NewsListActivity extends BaseActivity
         implements NewsItemDelegate {
@@ -53,6 +55,8 @@ public class NewsListActivity extends BaseActivity
     private SmartScrollListener mSmartScrollListener;
 
     private NewsAdapter mNewsAdapter;
+
+    private PublishSubject<List<NewsVO>> mNewsSubject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,12 +90,12 @@ public class NewsListActivity extends BaseActivity
         });
 
 
-        NewsModel.getInstance().getNews().observe(this, new Observer<List<NewsVO>>() {
-            @Override
-            public void onChanged(@Nullable List<NewsVO> newsVOS) {
-                mNewsAdapter.appendNewData(newsVOS);
-            }
-        });
+//        NewsModel.getInstance().getNews().observe(this, new Observer<List<NewsVO>>() {
+//            @Override
+//            public void onChanged(@Nullable List<NewsVO> newsVOS) {
+//                mNewsAdapter.appendNewData(newsVOS);
+//            }
+//        });
 
         rvNews.setEmptyView(vpEmptyNews);
         rvNews.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
@@ -107,6 +111,33 @@ public class NewsListActivity extends BaseActivity
         });
 
         rvNews.addOnScrollListener(mSmartScrollListener);
+
+        mNewsSubject = PublishSubject.create();
+        mNewsSubject.subscribe(new io.reactivex.Observer<List<NewsVO>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(List<NewsVO> newsVOS) {
+                mNewsAdapter.appendNewData(newsVOS);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+        NewsModel newsModel = new NewsModel();
+        newsModel.initPublishSubject(mNewsSubject);
+        newsModel.startLoadingMMNews();
     }
 
     @Override
@@ -176,10 +207,10 @@ public class NewsListActivity extends BaseActivity
 //        startActivity(intent);
     }
 
-//    @Subscribe(threadMode = ThreadMode.MAIN)
-//    public void onNewsDataLoaded(RestApiEvents.NewsDataLoadedEvent event) {
-//        mNewsAdapter.appendNewData(event.getLoadNews());
-//    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNewsDataLoaded(RestApiEvents.NewsDataLoadedEvent event) {
+        mNewsAdapter.appendNewData(event.getLoadNews());
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorInvokingAPI(RestApiEvents.ErrorInvokingAPIEvent event) {
