@@ -1,5 +1,6 @@
 package com.padcmyanmar.sfc.activities;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
@@ -11,10 +12,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.padcmyanmar.sfc.R;
 import com.padcmyanmar.sfc.SFCNewsApp;
@@ -34,10 +37,15 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 public class NewsListActivity extends BaseActivity
@@ -122,6 +130,9 @@ public class NewsListActivity extends BaseActivity
             @Override
             public void onNext(List<NewsVO> newsVOS) {
                 mNewsAdapter.appendNewData(newsVOS);
+
+                // continue assignment 3rd phase
+                decidePrimeNumberProcess();
             }
 
             @Override
@@ -139,6 +150,61 @@ public class NewsListActivity extends BaseActivity
         newsModel.initPublishSubject(mNewsSubject);
         newsModel.startLoadingMMNews();
     }
+
+    /** calculate Prime Number as assignment phase 3 **/
+    private void decidePrimeNumberProcess() {
+        Single<String> primeSingleObservable = Single.fromCallable(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                int[] dummyData = new int[]{2, 3, 5, 7, 8, 9, 10, 12, 15, 16, 20, 35};
+                return calculatePrime(dummyData);
+            }
+        });
+        primeSingleObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String s) {
+                        Snackbar.make(rvNews, "Calculated PrimeNo: " + s, Snackbar.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
+
+    }
+
+    @SuppressLint("DefaultLocale")
+    private String calculatePrime(int... dummyData) {
+        String primeNumbers = "";
+        for (int number : dummyData) {
+            if (number == 2 || isPrime(number)) {
+                primeNumbers = String.format("%s%d, ", primeNumbers, number);
+            }
+        }
+
+        if (!TextUtils.isEmpty(primeNumbers) && primeNumbers.contains(",")) {
+            primeNumbers = primeNumbers.substring(0, primeNumbers.lastIndexOf(", "));
+        }
+
+        return primeNumbers;
+    }
+
+    private boolean isPrime(int number) {
+        for (int i = 2; i < number; i++) {
+            if (number % i == 0) return false;
+        }
+        return true;
+    }
+    /** calculate Prime Number as assignment phase 3 **/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
