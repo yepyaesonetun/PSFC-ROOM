@@ -1,17 +1,16 @@
 package com.padcmyanmar.sfc.data.models;
 
-import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.padcmyanmar.sfc.data.db.AppDatabase;
+import com.padcmyanmar.sfc.data.vo.CommentActionVO;
+import com.padcmyanmar.sfc.data.vo.FavoriteActionVO;
 import com.padcmyanmar.sfc.data.vo.NewsVO;
 import com.padcmyanmar.sfc.data.vo.PublicationVO;
+import com.padcmyanmar.sfc.data.vo.SentToVO;
 import com.padcmyanmar.sfc.events.RestApiEvents;
-import com.padcmyanmar.sfc.network.MMNewsDataAgent;
 import com.padcmyanmar.sfc.network.MMNewsDataAgentImpl;
 import com.padcmyanmar.sfc.utils.AppConstants;
 
@@ -26,7 +25,7 @@ import java.util.List;
  * Created by aung on 12/3/17.
  */
 
-public class NewsModel extends ViewModel {
+public class NewsModel {
 
     private static NewsModel objInstance;
 
@@ -35,21 +34,23 @@ public class NewsModel extends ViewModel {
 
     private AppDatabase mAppDatabase;
 
-    public NewsModel() {
+    private NewsModel(Context context) {
+        mAppDatabase = AppDatabase.getNewsDatabase(context);
+
         EventBus.getDefault().register(this);
         mNews = new ArrayList<>();
         startLoadingMMNews();
     }
 
     public static NewsModel getInstance() {
-        if (objInstance == null) {
-            objInstance = new NewsModel();
+        if (objInstance != null) {
+            return objInstance;
         }
-        return objInstance;
+        throw new RuntimeException("In this phase, NewsModel object should already has the objInstance initialized.");
     }
 
-    public void initDatabase(Context context) {
-        mAppDatabase = AppDatabase.getNewsDatabase(context);
+    public static void initDatabase(Context context) {
+        objInstance = new NewsModel(context);
     }
 
     public LiveData<List<NewsVO>> getNews() {
@@ -61,20 +62,11 @@ public class NewsModel extends ViewModel {
     }
 
     public PublicationVO getPublication(String id){
-        return mAppDatabase.newsDao().getPublication(id);
+        return mAppDatabase.publicationDao().getPublicationById(id);
     }
 
     public void startLoadingMMNews() {
         MMNewsDataAgentImpl.getInstance().loadMMNews(AppConstants.ACCESS_TOKEN, mmNewsPageIndex);
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
-        AppDatabase.destoryInstance();
     }
 
 
@@ -88,7 +80,40 @@ public class NewsModel extends ViewModel {
 
         // insert new
         for (NewsVO newsVO : event.getLoadNews()) {
-            NewsVO vo = newsVO;
+
+            long insertedPublicationId = mAppDatabase.publicationDao().insertPublication(newsVO.getPublication());
+            mAppDatabase.newsInImageDao().insertImageWithNews(newsVO);
+
+            if (newsVO.getCommentActions() != null) {
+                for (CommentActionVO commentActionVO : newsVO.getCommentActions()) {
+                    mAppDatabase.actedUserDao().insertActedUser(commentActionVO.getActedUser());
+                    mAppDatabase.commentActionDao().insertCommentById(newsVO.getNewsId(),
+                            commentActionVO.getActedUser().getUserId(),
+                            commentActionVO);
+                }
+            }
+
+            if (newsVO.getFavoriteActions() != null) {
+                for (FavoriteActionVO favoriteActionVO : newsVO.getFavoriteActions()) {
+                    mAppDatabase.actedUserDao().insertActedUser(favoriteActionVO.getActedUser());
+                    mAppDatabase.favoriteActionDao().insertFavoriteById(newsVO.getNewsId(),
+                            favoriteActionVO.getActedUser().getUserId(),
+                            favoriteActionVO);
+                }
+            }
+
+            if (newsVO.getSentToActions() != null) {
+                for (SentToVO sentToVO : newsVO.getSentToActions()) {
+                    mAppDatabase.actedUserDao().insertActedUser(sentToVO.getSender());
+                    mAppDatabase.actedUserDao().insertActedUser(sentToVO.getReceiver());
+                    mAppDatabase.sendToDao().insertSendToById(newsVO.getNewsId(),
+                            sentToVO.getSender().getUserId(),
+                            sentToVO.getReceiver().getUserId(),
+                            sentToVO);
+                }
+            }
+
+            mAppDatabase.newsDao().insertNewsWithPublicationId(newsVO.getPublication().getPublicationId(), newsVO);
             mAppDatabase.newsDao().insertNew(newsVO);
         }
 

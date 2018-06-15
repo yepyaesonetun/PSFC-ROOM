@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.padcmyanmar.sfc.R;
+import com.padcmyanmar.sfc.data.models.NewsModel;
 import com.padcmyanmar.sfc.data.vo.NewsVO;
 import com.padcmyanmar.sfc.delegates.NewsItemDelegate;
 import com.padcmyanmar.sfc.viewholders.NewsViewHolder;

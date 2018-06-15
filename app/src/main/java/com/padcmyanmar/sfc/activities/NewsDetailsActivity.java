@@ -44,8 +44,6 @@ public class NewsDetailsActivity extends BaseActivity {
     @BindView(R.id.tv_news_details)
     TextView tvNewsDetails;
 
-    private NewsModel newsModel;
-
     /**
      * Create intent object to start NewsDetailsActivity.
      *
@@ -68,9 +66,7 @@ public class NewsDetailsActivity extends BaseActivity {
 
         mNewsId = getIntent().getStringExtra(IE_NEWS_ID);
 
-        newsModel  = ViewModelProviders.of(this).get(NewsModel.class);
-        newsModel.initDatabase(this);
-        NewsVO mNew = newsModel.getNew(mNewsId);
+        NewsVO mNew = NewsModel.getInstance().getNew(mNewsId);
 
         // set publisher name by ID
 //        String pId = mNew.getPublication().getPublicationId();

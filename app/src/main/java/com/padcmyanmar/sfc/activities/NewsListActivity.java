@@ -54,8 +54,6 @@ public class NewsListActivity extends BaseActivity
 
     private NewsAdapter mNewsAdapter;
 
-    private NewsModel newsModel;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,19 +85,18 @@ public class NewsListActivity extends BaseActivity
             }
         });
 
-        rvNews.setEmptyView(vpEmptyNews);
-        rvNews.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-        mNewsAdapter = new NewsAdapter(getApplicationContext(), this);
-        rvNews.setAdapter(mNewsAdapter);
 
-        newsModel  = ViewModelProviders.of(this).get(NewsModel.class);
-        newsModel.initDatabase(this);
-        newsModel.getNews().observe(this, new Observer<List<NewsVO>>() {
+        NewsModel.getInstance().getNews().observe(this, new Observer<List<NewsVO>>() {
             @Override
             public void onChanged(@Nullable List<NewsVO> newsVOS) {
                 mNewsAdapter.appendNewData(newsVOS);
             }
         });
+
+        rvNews.setEmptyView(vpEmptyNews);
+        rvNews.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+        mNewsAdapter = new NewsAdapter(getApplicationContext(), this);
+        rvNews.setAdapter(mNewsAdapter);
 
         mSmartScrollListener = new SmartScrollListener(new SmartScrollListener.OnSmartScrollListener() {
             @Override
