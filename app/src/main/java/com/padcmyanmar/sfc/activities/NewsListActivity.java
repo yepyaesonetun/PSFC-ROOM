@@ -129,6 +129,7 @@ public class NewsListActivity extends BaseActivity
 
             @Override
             public void onNext(List<NewsVO> newsVOS) {
+
                 mNewsAdapter.appendNewData(newsVOS);
 
                 // continue assignment 3rd phase
@@ -146,9 +147,8 @@ public class NewsListActivity extends BaseActivity
             }
         });
 
-        NewsModel newsModel = new NewsModel();
-        newsModel.initPublishSubject(mNewsSubject);
-        newsModel.startLoadingMMNews();
+        NewsModel newsModel = NewsModel.getInstance();
+        newsModel.startLoadingMMNews(mNewsSubject);
     }
 
     /** calculate Prime Number as assignment phase 3 **/
@@ -262,8 +262,8 @@ public class NewsListActivity extends BaseActivity
 
     @Override
     public void onTapNews(NewsVO vo) {
-        Intent intent = NewsDetailsActivity.newIntent(getApplicationContext(), vo.getNewsId());
-        startActivity(intent);
+//        Intent intent = NewsDetailsActivity.newIntent(getApplicationContext(), vo.getNewsId());
+//        startActivity(intent);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
