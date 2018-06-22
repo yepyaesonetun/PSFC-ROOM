@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="org.jetbrains:annotations:13.0@jar">
     <CLASSES>
-      <root url="jar://$APPLICATION_HOME_DIR$/gradle/m2repository/org/jetbrains/annotations/13.0/annotations-13.0.jar!/" />
+      <root url="jar:///private/var/folders/qj/_3z06c_57y58jp00g9brnkz80000gn/T/AppTranslocation/9A15083F-DE08-496E-AA98-345C86B9391C/d/Android Studio.app/Contents/gradle/m2repository/org/jetbrains/annotations/13.0/annotations-13.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

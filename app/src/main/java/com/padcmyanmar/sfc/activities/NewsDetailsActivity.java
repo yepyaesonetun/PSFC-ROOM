@@ -10,12 +10,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.padcmyanmar.sfc.R;
 import com.padcmyanmar.sfc.adapters.NewsImagesPagerAdapter;
 import com.padcmyanmar.sfc.data.models.NewsModel;
 import com.padcmyanmar.sfc.data.vo.NewsVO;
 import com.padcmyanmar.sfc.data.vo.PublicationVO;
+import com.padcmyanmar.sfc.mvp.presenters.NewsDetailPresenter;
+import com.padcmyanmar.sfc.mvp.views.NewsDetailView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,10 +28,9 @@ import butterknife.ButterKnife;
  * Created by aung on 11/11/17.
  */
 
-public class NewsDetailsActivity extends BaseActivity {
+public class NewsDetailsActivity extends BaseActivity implements NewsDetailView {
 
     private static final String IE_NEWS_ID = "IE_NEWS_ID";
-    private String mNewsId;
 
     @BindView(R.id.vp_news_details_images)
     ViewPager vpNewsDetailsImages;
@@ -43,6 +46,8 @@ public class NewsDetailsActivity extends BaseActivity {
 
     @BindView(R.id.tv_news_details)
     TextView tvNewsDetails;
+
+    private NewsDetailPresenter mPresenter;
 
     /**
      * Create intent object to start NewsDetailsActivity.
@@ -64,22 +69,36 @@ public class NewsDetailsActivity extends BaseActivity {
         setContentView(R.layout.activity_news_details);
         ButterKnife.bind(this, this);
 
-        mNewsId = getIntent().getStringExtra(IE_NEWS_ID);
-
-        NewsVO mNew = NewsModel.getInstance().getNew(mNewsId);
+        mPresenter = new NewsDetailPresenter(this);
+        mPresenter.onCreate();
 
         // set publisher name by ID
 //        String pId = mNew.getPublication().getPublicationId();
 //        PublicationVO publicationVO = newsModel.getPublication(pId);
 //        tvPublicationName.setText(publicationVO.getTitle());
-
-        tvNewsDetails.setText(mNew.getDetails());
-        tvPublishedDate.setText(mNew.getPostedDate());
-
+//
+//        tvNewsDetails.setText(mNew.getDetails());
+//        tvPublishedDate.setText(mNew.getPostedDate());
 
         NewsImagesPagerAdapter newsImagesPagerAdapter = new NewsImagesPagerAdapter(getApplicationContext());
         vpNewsDetailsImages.setAdapter(newsImagesPagerAdapter);
 
+        String mNewsId = getIntent().getStringExtra(IE_NEWS_ID);
+        mPresenter.onFinishUIComponentsSetUp(mNewsId);
+    }
 
+    @Override
+    public void displayDetail(NewsVO news) {
+        Glide.with(ivPublicationLogo.getContext())
+                .load(news.getPublication().getLogo())
+                .into(ivPublicationLogo);
+        tvPublicationName.setText(news.getPublication().getTitle());
+        tvPublishedDate.setText(news.getPostedDate());
+        tvNewsDetails.setText(news.getDetails());
+    }
+
+    @Override
+    public void displayErrorMsg(String errorMsg) {
+        Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
     }
 }

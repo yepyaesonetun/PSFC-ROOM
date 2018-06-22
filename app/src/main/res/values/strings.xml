@@ -30,4 +30,6 @@
     <string name="hint_enter_password">Password</string>
     <string name="format_news_statistical_data"><xliff:g id="like_count">%1$d</xliff:g> Likes - <xliff:g id="comment_count">%2$d</xliff:g> Comments and Sent to <xliff:g id="sent_count">%3$d</xliff:g> people</string>
     <string name="lbl_mark_my_home_on_google_map"><u><i>Mark my home on Google Map</i></u></string>
+    <string name="calculated_prime_txt_prefix">Calculated PrimeNo: <xliff:g name="prime_numbers">%1$s</xliff:g></string>
+    <string name="head_line_news_count">Top <xliff:g name="news_count">%1$d</xliff:g> News Today</string>
 </resources>

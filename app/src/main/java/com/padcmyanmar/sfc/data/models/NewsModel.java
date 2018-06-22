@@ -18,7 +18,9 @@ import com.padcmyanmar.sfc.utils.AppConstants;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Single;
@@ -37,11 +39,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewsModel {
 
-    private static NewsModel objInstance;
+    private static NewsModel sObjInstance;
 
     private int mmNewsPageIndex = 1;
+    private Map<String, NewsVO> mNewsMap;
 
-    private AppDatabase mAppDatabase;
+    //    private AppDatabase mAppDatabase;
     private MMNewsAPI theAPI;
 
 //    private NewsModel(Context context) {
@@ -54,11 +57,13 @@ public class NewsModel {
 
     private NewsModel() {
         initMMNewsAPI();
+        mNewsMap = new HashMap<>();
     }
 
     public MMNewsAPI getMMNewsAPI() {
         return theAPI;
     }
+
 
     private void initMMNewsAPI() {
         final OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -78,27 +83,30 @@ public class NewsModel {
     }
 
     public static NewsModel getInstance() {
-        if (objInstance == null) {
-            return new NewsModel();
+        if (sObjInstance == null) {
+            sObjInstance = new NewsModel();
         }
-//        throw new RuntimeException("In this phase, NewsModel object should already has the objInstance initialized.");
-        return null;
+        return sObjInstance;
     }
 
 //    public static void initDatabase(Context context) {
-//        objInstance = new NewsModel(context);
+//        sObjInstance = new NewsModel(context);
 //    }
 
 //    public LiveData<List<NewsVO>> getNews() {
 //        return mAppDatabase.newsDao().getAllNews();
 //    }
 
-    public NewsVO getNew(String id) {
-        return mAppDatabase.newsDao().getNew(id);
-    }
+//    public NewsVO getNew(String id) {
+//        return mAppDatabase.newsDao().getNew(id);
+//    }
+//
+//    public PublicationVO getPublication(String id) {
+//        return mAppDatabase.publicationDao().getPublicationById(id);
+//    }
 
-    public PublicationVO getPublication(String id) {
-        return mAppDatabase.publicationDao().getPublicationById(id);
+    public NewsVO getNewsById(String id) {
+        return mNewsMap.get(id);
     }
 
     // parsing Subject as parameter is good format
@@ -119,6 +127,9 @@ public class NewsModel {
                     @Override
                     public void onSuccess(List<NewsVO> newsVOS) {
                         newsListSubject.onNext(newsVOS);
+                        for (NewsVO vo : newsVOS) {
+                            mNewsMap.put(vo.getNewsId(), vo);
+                        }
                     }
 
                     @Override
@@ -134,53 +145,53 @@ public class NewsModel {
     }
 
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onNewsDataLoaded(RestApiEvents.NewsDataLoadedEvent event) {
-
-        // firstly delete data
-//        mAppDatabase.newsDao().deleteAllNews();
-
-        //mNews.addAll(event.getLoadNews());
-
-        // insert new
-        for (NewsVO newsVO : event.getLoadNews()) {
-
-            long insertedPublicationId = mAppDatabase.publicationDao().insertPublication(newsVO.getPublication());
-            mAppDatabase.newsInImageDao().insertImageWithNews(newsVO);
-
-            if (newsVO.getCommentActions() != null) {
-                for (CommentActionVO commentActionVO : newsVO.getCommentActions()) {
-                    mAppDatabase.actedUserDao().insertActedUser(commentActionVO.getActedUser());
-                    mAppDatabase.commentActionDao().insertCommentById(newsVO.getNewsId(),
-                            commentActionVO.getActedUser().getUserId(),
-                            commentActionVO);
-                }
-            }
-
-            if (newsVO.getFavoriteActions() != null) {
-                for (FavoriteActionVO favoriteActionVO : newsVO.getFavoriteActions()) {
-                    mAppDatabase.actedUserDao().insertActedUser(favoriteActionVO.getActedUser());
-                    mAppDatabase.favoriteActionDao().insertFavoriteById(newsVO.getNewsId(),
-                            favoriteActionVO.getActedUser().getUserId(),
-                            favoriteActionVO);
-                }
-            }
-
-            if (newsVO.getSentToActions() != null) {
-                for (SentToVO sentToVO : newsVO.getSentToActions()) {
-                    mAppDatabase.actedUserDao().insertActedUser(sentToVO.getSender());
-                    mAppDatabase.actedUserDao().insertActedUser(sentToVO.getReceiver());
-                    mAppDatabase.sendToDao().insertSendToById(newsVO.getNewsId(),
-                            sentToVO.getSender().getUserId(),
-                            sentToVO.getReceiver().getUserId(),
-                            sentToVO);
-                }
-            }
-
-            mAppDatabase.newsDao().insertNewsWithPublicationId(newsVO.getPublication().getPublicationId(), newsVO);
-            mAppDatabase.newsDao().insertNew(newsVO);
-        }
-
-        mmNewsPageIndex = event.getLoadedPageIndex() + 1;
-    }
+//    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+//    public void onNewsDataLoaded(RestApiEvents.NewsDataLoadedEvent event) {
+//
+//        // firstly delete data
+////        mAppDatabase.newsDao().deleteAllNews();
+//
+//        //mNews.addAll(event.getLoadNews());
+//
+//        // insert new
+//        for (NewsVO newsVO : event.getLoadNews()) {
+//
+//            long insertedPublicationId = mAppDatabase.publicationDao().insertPublication(newsVO.getPublication());
+//            mAppDatabase.newsInImageDao().insertImageWithNews(newsVO);
+//
+//            if (newsVO.getCommentActions() != null) {
+//                for (CommentActionVO commentActionVO : newsVO.getCommentActions()) {
+//                    mAppDatabase.actedUserDao().insertActedUser(commentActionVO.getActedUser());
+//                    mAppDatabase.commentActionDao().insertCommentById(newsVO.getNewsId(),
+//                            commentActionVO.getActedUser().getUserId(),
+//                            commentActionVO);
+//                }
+//            }
+//
+//            if (newsVO.getFavoriteActions() != null) {
+//                for (FavoriteActionVO favoriteActionVO : newsVO.getFavoriteActions()) {
+//                    mAppDatabase.actedUserDao().insertActedUser(favoriteActionVO.getActedUser());
+//                    mAppDatabase.favoriteActionDao().insertFavoriteById(newsVO.getNewsId(),
+//                            favoriteActionVO.getActedUser().getUserId(),
+//                            favoriteActionVO);
+//                }
+//            }
+//
+//            if (newsVO.getSentToActions() != null) {
+//                for (SentToVO sentToVO : newsVO.getSentToActions()) {
+//                    mAppDatabase.actedUserDao().insertActedUser(sentToVO.getSender());
+//                    mAppDatabase.actedUserDao().insertActedUser(sentToVO.getReceiver());
+//                    mAppDatabase.sendToDao().insertSendToById(newsVO.getNewsId(),
+//                            sentToVO.getSender().getUserId(),
+//                            sentToVO.getReceiver().getUserId(),
+//                            sentToVO);
+//                }
+//            }
+//
+//            mAppDatabase.newsDao().insertNewsWithPublicationId(newsVO.getPublication().getPublicationId(), newsVO);
+//            mAppDatabase.newsDao().insertNew(newsVO);
+//        }
+//
+//        mmNewsPageIndex = event.getLoadedPageIndex() + 1;
+//    }
 }

@@ -62,6 +62,18 @@ public class NewsViewHolder extends BaseViewHolder<NewsVO> {
 //        PublicationVO publicationVO = NewsModel.getInstance().getPublication(data.getPublicationId());
 //        tvPublicationName.setText(publicationVO.getTitle());
 
+        if(!data.getImages().isEmpty()){
+            Glide.with(ivNewsHeroImage.getContext())
+                    .load(data.getImages().get(0))
+                    .into(ivNewsHeroImage);
+        }else {
+            ivNewsHeroImage.setVisibility(View.GONE);
+        }
+
+        Glide.with(ivPublicationLogo.getContext())
+                .load(data.getPublication().getLogo())
+                .into(ivPublicationLogo);
+
         tvPublishedDate.setText(data.getPostedDate());
         tvBriefNews.setText(data.getBrief());
 //        if (!data.getImages().isEmpty()) {

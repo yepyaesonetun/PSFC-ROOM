@@ -1,0 +1,140 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.padcmyanmar.sfc.activities.NewsListNextDesignActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <com.padcmyanmar.sfc.components.CustomNestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.padcmyanmar.sfc.activities.NewsListActivity"
+            tools:showIn="@layout/activity_news_list">
+
+            <RelativeLayout
+                android:id="@+id/view_headline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true">
+
+                <TextView
+                    android:id="@+id/tv_head_line_user_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignStart="@+id/tv_news_count"
+                    android:paddingTop="@dimen/margin_medium"
+                    android:text="Yours briefing"
+                    android:textSize="@dimen/text_regular_2x"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_news_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_head_line_user_name"
+                    android:layout_marginLeft="@dimen/margin_medium_2"
+                    android:layout_marginRight="@dimen/margin_medium_2"
+                    android:paddingBottom="@dimen/margin_medium"
+                    android:text="Top 3 news stories right now"
+                    android:textSize="@dimen/text_smaller" />
+
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/cv_head_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_news_count"
+                    android:layout_marginLeft="@dimen/margin_medium_2"
+                    android:layout_marginRight="@dimen/margin_medium_2"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/margin_small_n"
+                    card_view:cardElevation="2dp">
+
+                    <ImageView
+                        android:id="@+id/iv_news_head_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="220dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/dummy_news_04" />
+
+                </android.support.v7.widget.CardView>
+
+                <ImageView
+                    android:id="@+id/iv_head_line_publication_logo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_below="@id/cv_head_line"
+                    android:layout_marginLeft="@dimen/margin_medium_2"
+                    android:padding="@dimen/margin_small"
+                    tools:src="@drawable/img_publication_logo_placeholder" />
+
+                <TextView
+                    android:id="@+id/tv_head_line_publication_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/cv_head_line"
+                    android:layout_toEndOf="@+id/iv_head_line_publication_logo"
+                    android:paddingTop="@dimen/margin_medium"
+                    android:textSize="@dimen/text_small"
+                    tools:text="Eleven Media" />
+
+                <TextView
+                    android:id="@+id/tv_head_line_news_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/iv_head_line_publication_logo"
+                    android:layout_marginLeft="@dimen/margin_medium_2"
+                    android:layout_marginRight="@dimen/margin_medium_2"
+                    android:maxLines="1"
+                    android:paddingBottom="@dimen/margin_medium"
+                    android:text="News Title"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+            <com.padcmyanmar.sfc.components.SmartRecyclerView
+                android:id="@+id/rv_news"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/view_headline"
+                android:paddingTop="@dimen/margin_small_n">
+
+            </com.padcmyanmar.sfc.components.SmartRecyclerView>
+
+            <include
+                android:id="@+id/vp_empty_news"
+                layout="@layout/view_pod_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+
+        </RelativeLayout>
+    </com.padcmyanmar.sfc.components.CustomNestedScrollView>
+
+
+</android.support.design.widget.CoordinatorLayout>
